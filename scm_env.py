@@ -98,7 +98,7 @@ class scmEnv:
         k = self.demand_cost
         h = self.holding_cost
         a = self.discount
-        II = np.append(I, 0)
+        II = np.append( I, 0)
         RR = np.append(R, S[-1])
         P = a ** n * np.sum(p * S - (r * RR + k * U + h * II))
         self.profit[n] = P
