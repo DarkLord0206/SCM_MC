@@ -116,3 +116,6 @@ class ScmEnv:
         else:
             done = False
         return self.state, reward, done, {}
+
+    def reset(self):
+        self._reset()

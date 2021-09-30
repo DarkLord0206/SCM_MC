@@ -3,10 +3,12 @@ from tensorflow.keras import layers, Model
 import numpy as np
 from tensorflow.keras import backend as K
 from tensorflow.keras.optimizers import Adam
+from scm_env import ScmEnv
 
 
 class MC:
     def __init__(self, input_dims, output_dims):
+        self.env = ScmEnv()
         self.input_dims = input_dims
         self.output_dims = output_dims
         self.epsilon = 1000
@@ -64,3 +66,26 @@ class MC:
             temp = new_probs.copy()
             temp[x] = 1 - self.epsilon + self.epsilon / self.output_dims
             new_probs_list.append(temp)
+        self.train_fn(unique_states, new_probs_list)
+
+    def computer_action(self, state):
+        probs = self.model.predict(state)
+        action = np.random.choice(self.output_dims, p=probs)
+        return action
+
+    def create_episode(self):
+        state = self.env.reset()
+        done = False
+        state_list = []
+        action_list = []
+        reward_list = []
+        while not done:
+            action = self.computer_action(state)
+            new_state, reward, done, info = self.env.step(action)
+            state_list.append(state)
+            action_list.append(action)
+            reward_list.append(reward)
+            state = new_state
+        total_reward = sum(reward_list)
+        print(total_reward)
+        self.fit(state_list, action_list, reward_list)
