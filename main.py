@@ -9,6 +9,7 @@ class MC:
     def __init__(self, input_dims, output_dims):
         self.input_dims = input_dims
         self.output_dims = output_dims
+        self.epsilon = 1000
         self.X = layers.Input(shape=(input_dims,))
         net = self.X
         net = layers.Dense(10)(net)
@@ -31,12 +32,15 @@ class MC:
     def fit(self, state_list, action_list, reward_list):
         rewards = {}
         actions = {}
+        unique_states = []
         for x, y, z in zip(state_list, action_list, reward_list):
+            k = x.copy()
             x = x.tobytes()
             if x in actions:
                 if y not in actions[x]:
                     actions[x].append(y)
             else:
+                unique_states.append(k)
                 actions[x] = [y]
             if (x, y) in rewards:
                 rewards[(x, y)] += z
@@ -55,5 +59,8 @@ class MC:
                     maxv = rewards[(x, y)]
                     maxr = y
             a_stars.append(maxr)
-        new_probs = []
-
+        new_probs = [self.epsilon / self.output_dims] * self.output_dims
+        for x in a_stars:
+            temp = new_probs.copy()
+            temp[x] = 1 - self.epsilon + self.epsilon / self.output_dims
+            new_probs_list.append(temp)
