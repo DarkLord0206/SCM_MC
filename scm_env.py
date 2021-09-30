@@ -20,8 +20,7 @@ class ScmEnv:
         self.map = np.array([[a, b, c] for a in range(50) for b in range(30) for c in range(20)])  # actions space
         lt_max = self.lead_time.max()
         self.action_space_len = 50 * 30 * 20
-        self.obervation_space = []
-        self.observation_space_len = 4 * (lt_max + 1)
+        self.observation_space_len = 33
 
     def _reset(self):
         self.I = np.zeros([self.periods + 1, 3])  # inventoryt is empty right now
@@ -70,7 +69,7 @@ class ScmEnv:
         m = 4
 
         c = self.supply_capacity
-        self.action_log[n] = R.copy
+        self.action_log[n] = R.copy()
         Im1 = np.append(I[1:], np.inf)
 
         Rcopy = R.copy()
@@ -118,4 +117,4 @@ class ScmEnv:
         return self.state, reward, done, {}
 
     def reset(self):
-        self._reset()
+        return self._reset()
