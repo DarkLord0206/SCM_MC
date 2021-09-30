@@ -27,6 +27,33 @@ class MC:
 
         self.train_fn = K.function(inputs=[self.model.input, new_probs_placeholder], outputs=[self.model.outputs],
                                    updates=updates)
-    def fit(self,state_list,action_list,reward_list):
-        rewards=
-        new_probs=np[.zeros(7)
+
+    def fit(self, state_list, action_list, reward_list):
+        rewards = {}
+        actions = {}
+        for x, y, z in zip(state_list, action_list, reward_list):
+            x = x.tobytes()
+            if x in actions:
+                if y not in actions[x]:
+                    actions[x].append(y)
+            else:
+                actions[x] = [y]
+            if (x, y) in rewards:
+                rewards[(x, y)] += z
+            else:
+                rewards[(x, y)] = z
+        for x, y in rewards:
+            rewards[(x, y)] /= len(actions[x])
+        new_probs_list = []
+        a_stars = []
+
+        for x in actions:
+            maxr = 0
+            maxv = -1
+            for y in actions[x]:
+                if rewards[(x, y)] > maxv:
+                    maxv = rewards[(x, y)]
+                    maxr = y
+            a_stars.append(maxr)
+        new_probs = []
+
